@@ -1,0 +1,40 @@
+﻿grammar Grammar;
+
+/*
+ * Parser Rules
+ */
+
+compileUnit : expression;
+
+expression :
+ LPAREN expression RPAREN #ParenthesizedExpr
+ | operatorToken=(PLUS | MINUS) expression #UnaryExpr
+ | MMIN LPAREN paramlist=arglist RPAREN #MMinExpr
+ | MMAX LPAREN paramlist=arglist RPAREN #MMaxExpr
+ | MIN LPAREN expression ',' expression RPAREN #MinExpr
+ | MAX LPAREN expression ',' expression RPAREN #MaxExpr
+ | expression EXPONENT expression #ExponentialExpr
+ | NUMBER #NumberExpr
+ | IDENTIFIER #IdentifierExpr
+ | EOF #EOFExpr
+;
+/*
+ * Lexer Rules
+ */
+
+NUMBER : INT ('.' INT)?; 
+IDENTIFIER : [a-zA-Z]+[1-9][0-9]*;
+INT : ('0'..'9')+;
+arglist: expression (',' expression)*;
+EXPONENT : '^';
+MINUS : '-';
+PLUS : '+';
+LPAREN : '(';
+RPAREN : ')';
+MIN : 'min';
+MAX : 'max';
+MMAX : 'mmax';
+MMIN : 'mmin';
+
+// skip spaces, tabs, newlines
+WS : [ \t\r\n] -> skip;
