@@ -4,8 +4,10 @@ namespace MyExcel;
 
 public partial class MainPage : ContentPage
 {
-    int NumberOfCols = 5; // кількість стовпчиків (A to Z)
-    int NumberOfRows = 10; // кількість рядків
+    static int CountColumn = 5;
+    static int CountRow = 10;
+
+    Dictionary<string, IView> cells = new Dictionary<string, IView>(capacity: (int)(CountColumn*CountRow*1.6));
 
     public MainPage()
     {
@@ -24,18 +26,12 @@ public partial class MainPage : ContentPage
     {
         grid.RowDefinitions.Add(new RowDefinition()); // Row for labels
         // Додати стовпці та підписи для стовпців
-        for (int col = 0; col <= NumberOfCols; col++)
+        for (int col = 0; col <= CountColumn; col++)
         {
             grid.ColumnDefinitions.Add(new ColumnDefinition());
-            var label = new Label
-            {
-                Text = GetColumnName(col),
-                VerticalOptions = LayoutOptions.Center,
-                HorizontalOptions = LayoutOptions.Center
-            };
-            Grid.SetRow(label, 0);
-            Grid.SetColumn(label, col);
-            grid.Children.Add(label);
+            var label = NewLabel(GetColumnName(col));
+            AddElement(label, 0, col);
+            cells.Add(label.Text, label);
             Debug.WriteLine("Label {0} added at index {1}", label.Text, grid.Children.Count - 1);
         }
     }
@@ -43,33 +39,20 @@ public partial class MainPage : ContentPage
     private void AddRowsAndCellEntries()
     {
         // Додати рядки, підписи для рядків та комірки
-        for (int row = 0; row < NumberOfRows; row++)
+        for (int row = 1; row <= CountRow; row++)
         {
             grid.RowDefinitions.Add(new RowDefinition());
             // Додати підпис для номера рядка
-            var label = new Label
-            {
-                Text = (row + 1).ToString(),
-                VerticalOptions = LayoutOptions.Center,
-                HorizontalOptions = LayoutOptions.Center
-            };
-            Grid.SetRow(label, row + 1);
-            Grid.SetColumn(label, 0);
-            grid.Children.Add(label);
+            var label = NewLabel(row.ToString());
+            AddElement(label, row, 0);
+            cells.Add(label.Text, label);
             Debug.WriteLine("Label {0} added at index {1}", label.Text, grid.Children.Count - 1);
             // Додати комірки (Entry) для вмісту
-            for (int col = 0; col < NumberOfCols; col++)
+            for (int col = 1; col <= CountColumn; col++)
             {
-                var entry = new Entry
-                {
-                    Text = grid.Children.Count.ToString(),
-                    VerticalOptions = LayoutOptions.Center,
-                    HorizontalOptions = LayoutOptions.Center
-                };
-                entry.Unfocused += Entry_Unfocused; // обробник події Unfocused
-                Grid.SetRow(entry, row + 1);
-                Grid.SetColumn(entry, col + 1);
-                grid.Children.Add(entry);
+                var entry = NewEmptyEntry();
+                AddElement(entry, row, col);
+                cells.Add(GetColumnName(col) + label.Text, entry);
                 Debug.WriteLine("Entry {0} added at index {1}", entry.Text, grid.Children.Count - 1);
             }
         }
@@ -105,47 +88,15 @@ public partial class MainPage : ContentPage
         }
     }
 
-    private void CalculateButton_Clicked(object sender, EventArgs e)
-    {
-        //// Обробка кнопки "Порахувати"
-        //// Use as test
-        //int numOfCols = DefaultNumberOfCols + ColsAdded;
-        //int lastInd = numOfCols + numOfCols * (DefaultNumberOfRows + RowsAdded);
-        //Debug.WriteLine("lastInd = {0}", lastInd);
-        //grid.ColumnDefinitions.RemoveAt(grid.ColumnDefinitions.Count - 1);
-
-        //for (int i = lastInd; i < lastInd + DefaultNumberOfRows + RowsAdded; i++)
-        //{
-        //    int count = grid.Children.Count - 1;
-        //    grid.Children.RemoveAt(lastInd);
-        //    Debug.WriteLine("RemoveAt({0})", i);
-        //    if(grid.Children.Count != count)
-        //    {
-        //        Debug.WriteLine("smt");
-        //    }
-        //}
-        //ColsAdded--;
-    }
-
     private void SaveButton_Clicked(object sender, EventArgs e)
     {
-        int n = Int32.Parse(textInput.Text);
-        grid.Children.RemoveAt(n);
-        Debug.WriteLine("RemovaAt({0})", n);
-    }
-
-    private void ReadButton_Clicked(object sender, EventArgs e)
-    {
-        // Обробка кнопки "Прочитати"
     }
 
     private async void ExitButton_Clicked(object sender, EventArgs e)
     {
         bool answer = await DisplayAlert("Підтвердження", "Ви дійсно хочете вийти ? ", "Так", "Ні");
-        if (answer)
-        {
-            System.Environment.Exit(0);
-        }
+        if (!answer) return;
+        System.Environment.Exit(0);
     }
 
     private async void HelpButton_Clicked(object sender, EventArgs e)
@@ -155,107 +106,118 @@ public partial class MainPage : ContentPage
 
     private void DeleteColumnButton_Clicked(object sender, EventArgs e)
     {
-        if (grid.ColumnDefinitions.Count > 1)
-        {
-            int lastColumnIndex = grid.ColumnDefinitions.Count - 1;
+        if (grid.ColumnDefinitions.Count <= 1) return;
 
-            grid.ColumnDefinitions.RemoveAt(lastColumnIndex);
-            //grid.Children.RemoveAt(lastColumnIndex); // Remove label
-            
-            for (int row = 0; row < NumberOfRows + 1; row++)
-            {
-                int removeIndex = row * (numberOfCols + 1) + lastColumnIndex - row;
-                // Remove entry
-                grid.Children.RemoveAt(removeIndex);
-                Debug.WriteLine("RemoveAt({0})", removeIndex);
-            }
-            ColsAdded--;
+        // TODO: Check if rest of entry's not depent on any of column entry
+
+        int lastColumnIndex = grid.ColumnDefinitions.Count - 1;
+        grid.ColumnDefinitions.RemoveAt(lastColumnIndex);
+        string columnName = GetColumnName(CountColumn);
+        grid.Children.Remove(cells[columnName]); // Remove column label
+        
+        for (int row = 1; row <= CountRow; row++)
+        {
+            grid.Children.Remove(cells[columnName+row]);
+            // TODO: Delete from cells
         }
+        CountColumn--;
     }
 
     private void DeleteRowButton_Clicked(object sender, EventArgs e)
     {
-        if (RowsAdded <= 0)
+        if (grid.RowDefinitions.Count <= 1) return;
+
+        // TODO: Check if rest of entry's not depent on any of row entry
+
+        int lastRowIndex = grid.RowDefinitions.Count - 1;
+        grid.RowDefinitions.RemoveAt(lastRowIndex); // Remove row label
+
+        grid.Children.Remove(cells[CountRow.ToString()]);
+        for (int col = 1; col <= CountColumn; col++)
         {
-            int lastRowIndex = grid.RowDefinitions.Count - 1;
-            grid.RowDefinitions.RemoveAt(lastRowIndex);
-            //grid.Children.RemoveAt(lastRowIndex * (DefaultNumberOfCols + 1)); // Remove label
-            for (int col = 0; col < DefaultNumberOfCols; col++)
-            {
-                grid.Children.RemoveAt((col * DefaultNumberOfRows) + lastRowIndex); // Remove entry
-            }
-            RowsAdded--;
+            grid.Children.Remove(cells[GetColumnName(col) + CountRow]);
+            // TODO: Delete from cells
         }
+        CountRow--;
     }
 
 
     private void AddRowButton_Clicked(object sender, EventArgs e)
     {
-        int newRow = grid.RowDefinitions.Count;
+        int newRowIndex = grid.RowDefinitions.Count;
         // Add a new row definition
         grid.RowDefinitions.Add(new RowDefinition());
         // Add label for the row number
-        var label = new Label
-        {
-            Text = newRow.ToString(),
-            VerticalOptions = LayoutOptions.Center,
-            HorizontalOptions = LayoutOptions.Center
-        };
-        Grid.SetRow(label, newRow);
-        Grid.SetColumn(label, 0);
-        grid.Children.Add(label);
+        var label = NewLabel(newRowIndex.ToString());
+        AddElement(label, newRowIndex, 0);
+        cells.Add(label.Text, label);
         Debug.WriteLine("Label {0} added at index {1}", label.Text, grid.Children.Count - 1);
-        int numOfCols = DefaultNumberOfCols + ColsAdded;
         // Add entry cells for the new row
-        for (int col = 0; col < numOfCols; col++)
+        for (int col = 1; col <= CountColumn; col++)
         {
-            var entry = new Entry
-            {
-                Text = grid.Children.Count.ToString(),
-                VerticalOptions = LayoutOptions.Center,
-                HorizontalOptions = LayoutOptions.Center
-            };
-            entry.Unfocused += Entry_Unfocused;
-            Grid.SetRow(entry, newRow);
-            Grid.SetColumn(entry, col + 1);
-            grid.Children.Add(entry);
+            var entry = NewEmptyEntry();
+            AddElement(entry, newRowIndex, col);
+            cells.Add(GetColumnName(col) + label.Text, entry);
             Debug.WriteLine("Entry {0} added at index {1}", entry.Text, grid.Children.Count - 1);
         }
-        RowsAdded++;
+        CountRow++;
     }
 
     private void AddColumnButton_Clicked(object sender, EventArgs e)
     {
-        int newColumn = grid.ColumnDefinitions.Count;
+        int newColumnIndex = grid.ColumnDefinitions.Count;
         // Add a new column definition
         grid.ColumnDefinitions.Add(new ColumnDefinition());
         // Add label for the column name
-        var label = new Label
+        var label = NewLabel(GetColumnName(newColumnIndex));
+        AddElement(label, 0, newColumnIndex);
+        cells.Add(label.Text, label);
+        Debug.WriteLine("Label {0} added at index {1}", label.Text, grid.Children.Count - 1);
+        // Add entry cells for the new column
+        for (int row = 1; row <= CountRow; row++)
         {
-            Text = GetColumnName(newColumn),
+            var entry = NewEmptyEntry();
+            AddElement(entry, row, newColumnIndex);
+            cells.Add(label.Text + row, entry);
+            Debug.WriteLine("Entry {0} added at index {1}", entry.Text, grid.Children.Count - 1);
+        }
+        CountColumn++;
+    }
+
+    private static Label NewLabel(string text)
+    {
+        return new Label {
+            Text = text,
             VerticalOptions = LayoutOptions.Center,
             HorizontalOptions = LayoutOptions.Center
         };
-        Grid.SetRow(label, 0);
-        Grid.SetColumn(label, newColumn);
-        grid.Children.Add(label);
-        Debug.WriteLine("Label {0} added at index {1}", label.Text, grid.Children.Count - 1);
-        int numOfRows = DefaultNumberOfRows + RowsAdded;
-        // Add entry cells for the new column
-        for (int row = 0; row < numOfRows; row++)
-        {
-            var entry = new Entry
-            {
-                Text = grid.Children.Count.ToString(),
-                VerticalOptions = LayoutOptions.Center,
-                HorizontalOptions = LayoutOptions.Center
-            };
-            entry.Unfocused += Entry_Unfocused;
-            Grid.SetRow(entry, row + 1);
-            Grid.SetColumn(entry, newColumn);
-            grid.Children.Add(entry);
-            Debug.WriteLine("Entry {0} added at index {1}", entry.Text, grid.Children.Count - 1);
-        }
-        ColsAdded++;
     }
+
+    private Entry NewEmptyEntry()
+    {
+        var entry = new Entry
+        {
+            Text = string.Empty,
+            VerticalOptions = LayoutOptions.Center,
+            HorizontalOptions = LayoutOptions.Center
+        };
+        entry.Unfocused += Entry_Unfocused;
+        return entry;
+    }
+
+    private void AddElement(BindableObject item, int row, int col)
+    {
+        Grid.SetRow(item, row);
+        Grid.SetColumn(item, col);
+        grid.Children.Add((IView)item);   
+        // cells.Add()
+    }
+
+    // private void AddLabel(Label label, int row, int col){
+    //
+    // }
+    //
+    // private void AddEntry(BindableObject entry, int row, int col){
+    //
+    // }
 }

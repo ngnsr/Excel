@@ -4,6 +4,7 @@ namespace MyExcel
 {
     public static class Calculator
     {
+        static Table table = new Table();
 
         public static double Evaluate(string expression)
         {
