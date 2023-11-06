@@ -30,7 +30,7 @@ public partial class MainPage : ContentPage
         {
             grid.ColumnDefinitions.Add(new ColumnDefinition());
             var label = NewLabel(GetColumnName(col));
-            AddElement(label, 0, col);
+            AddLabel(label, 0, col);
             cells.Add(label.Text, label);
             Debug.WriteLine("Label {0} added at index {1}", label.Text, grid.Children.Count - 1);
         }
@@ -44,14 +44,14 @@ public partial class MainPage : ContentPage
             grid.RowDefinitions.Add(new RowDefinition());
             // Додати підпис для номера рядка
             var label = NewLabel(row.ToString());
-            AddElement(label, row, 0);
+            AddLabel(label, row, 0);
             cells.Add(label.Text, label);
             Debug.WriteLine("Label {0} added at index {1}", label.Text, grid.Children.Count - 1);
             // Додати комірки (Entry) для вмісту
             for (int col = 1; col <= CountColumn; col++)
             {
                 var entry = NewEmptyEntry();
-                AddElement(entry, row, col);
+                AddEntry(entry, row, col);
                 cells.Add(GetColumnName(col) + label.Text, entry);
                 Debug.WriteLine("Entry {0} added at index {1}", entry.Text, grid.Children.Count - 1);
             }
@@ -75,16 +75,17 @@ public partial class MainPage : ContentPage
     async private void Entry_Unfocused(object sender, FocusEventArgs e)
     {
         var entry = (Entry)sender;
-        var row = Grid.GetRow(entry) - 1;
-        var col = Grid.GetColumn(entry) - 1;
+        var row = Grid.GetRow(entry);
+        var col = Grid.GetColumn(entry);
         var content = entry.Text;
         try
         {
-            entry.Text = Calculator.Evaluate(content).ToString();
+            entry.Text = Table.Refresh(GetColumnName(col) + row, entry.Text).ToString();
         }
         catch
         {
-            await DisplayAlert("Помилка", "Введено недопустимий вираз", "Ок");
+            if(entry.Text != string.Empty)
+                await DisplayAlert("Помилка", "Введено недопустимий вираз", "Ок");
         }
     }
 
@@ -149,14 +150,14 @@ public partial class MainPage : ContentPage
         grid.RowDefinitions.Add(new RowDefinition());
         // Add label for the row number
         var label = NewLabel(newRowIndex.ToString());
-        AddElement(label, newRowIndex, 0);
+        AddLabel(label, newRowIndex, 0);
         cells.Add(label.Text, label);
         Debug.WriteLine("Label {0} added at index {1}", label.Text, grid.Children.Count - 1);
         // Add entry cells for the new row
         for (int col = 1; col <= CountColumn; col++)
         {
             var entry = NewEmptyEntry();
-            AddElement(entry, newRowIndex, col);
+            AddEntry(entry, newRowIndex, col);
             cells.Add(GetColumnName(col) + label.Text, entry);
             Debug.WriteLine("Entry {0} added at index {1}", entry.Text, grid.Children.Count - 1);
         }
@@ -170,14 +171,14 @@ public partial class MainPage : ContentPage
         grid.ColumnDefinitions.Add(new ColumnDefinition());
         // Add label for the column name
         var label = NewLabel(GetColumnName(newColumnIndex));
-        AddElement(label, 0, newColumnIndex);
+        AddLabel(label, 0, newColumnIndex);
         cells.Add(label.Text, label);
         Debug.WriteLine("Label {0} added at index {1}", label.Text, grid.Children.Count - 1);
         // Add entry cells for the new column
         for (int row = 1; row <= CountRow; row++)
         {
             var entry = NewEmptyEntry();
-            AddElement(entry, row, newColumnIndex);
+            AddEntry(entry, row, newColumnIndex);
             cells.Add(label.Text + row, entry);
             Debug.WriteLine("Entry {0} added at index {1}", entry.Text, grid.Children.Count - 1);
         }
@@ -202,22 +203,31 @@ public partial class MainPage : ContentPage
             HorizontalOptions = LayoutOptions.Center
         };
         entry.Unfocused += Entry_Unfocused;
+        entry.Focused += Entry_Focused;
         return entry;
     }
 
-    private void AddElement(BindableObject item, int row, int col)
+    private void Entry_Focused(object sender, FocusEventArgs e)
     {
-        Grid.SetRow(item, row);
-        Grid.SetColumn(item, col);
-        grid.Children.Add((IView)item);   
-        // cells.Add()
+        var entry = (Entry) sender;
+        var row = Grid.GetRow(entry);
+        var col = Grid.GetColumn(entry);
+        entry.Text = Table.GetExpression(GetColumnName(col) + row);
     }
 
-    // private void AddLabel(Label label, int row, int col){
-    //
-    // }
-    //
-    // private void AddEntry(BindableObject entry, int row, int col){
-    //
-    // }
+    private void AddLabel(Label label, int row, int col)
+    {
+        Grid.SetRow(label, row);
+        Grid.SetColumn(label, col);
+        grid.Children.Add(label);
+    }
+
+    private void AddEntry(Entry entry, int row, int col)
+    {
+        Grid.SetRow(entry, row);
+        Grid.SetColumn(entry, col);
+        grid.Children.Add(entry);
+
+        Table.AddNewEntry(GetColumnName(col) + row);
+    }
 }

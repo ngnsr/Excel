@@ -8,7 +8,7 @@ namespace MyExcel
 	{
         //таблиця ідентифікаторів (тут для прикладу)
         //в лабораторній роботі заміните на свою!!!!
-        Dictionary<string, double> tableIdentifier = new Dictionary<string, double>();
+        //Dictionary<string, double> tableIdentifier = new Dictionary<string, double>();
 
         public override double VisitCompileUnit(GrammarParser.CompileUnitContext context)
         {
@@ -31,14 +31,10 @@ namespace MyExcel
         //IdentifierExpr
         public override double VisitIdentifierExpr(GrammarParser.IdentifierExprContext context)
         {
-            var result = context.GetText();
-            double value;
+            var identifier = context.GetText();
+
             //видобути значення змінної з таблиці
-            if (tableIdentifier.TryGetValue(result.ToString(), out value))
-            {
-                return value;
-            }
-            else return 0.0;
+            return Table.GetValue(identifier);
         }
 
 

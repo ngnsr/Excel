@@ -27,6 +27,5 @@ x:Class="MyExcel.MainPage">
 	<ScrollView Grid.Row="2" Grid.ColumnSpan="2">
 		<Grid x:Name="grid"></Grid>
 	</ScrollView>
-
 </Grid>
 </ContentPage>

@@ -4,7 +4,7 @@
  * Parser Rules
  */
 
-compileUnit : expression;
+compileUnit : expression EOF;
 
 expression :
  LPAREN expression RPAREN #ParenthesizedExpr
@@ -16,7 +16,6 @@ expression :
  | expression EXPONENT expression #ExponentialExpr
  | NUMBER #NumberExpr
  | IDENTIFIER #IdentifierExpr
- | EOF #EOFExpr
 ;
 /*
  * Lexer Rules
