@@ -1,15 +1,10 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using Antlr4.Runtime.Misc;
 
 namespace MyExcel
 {
 	public class GrammarVisitor: GrammarBaseVisitor<double>
 	{
-        //таблиця ідентифікаторів (тут для прикладу)
-        //в лабораторній роботі заміните на свою!!!!
-        //Dictionary<string, double> tableIdentifier = new Dictionary<string, double>();
-
         public override double VisitCompileUnit(GrammarParser.CompileUnitContext context)
         {
             return Visit(context.expression());
@@ -32,7 +27,8 @@ namespace MyExcel
         public override double VisitIdentifierExpr(GrammarParser.IdentifierExprContext context)
         {
             var identifier = context.GetText();
-
+            Table.cells[Calculator.EvaluatingCellName].DependsOn.Add(identifier);
+            Table.cells[identifier].AppearsIn.Add(Calculator.EvaluatingCellName);
             //видобути значення змінної з таблиці
             return Table.GetValue(identifier);
         }

@@ -2,10 +2,21 @@
 
 namespace MyExcel
 {
-    public class Calculator
+    public static class Calculator
     {
+        public static string EvaluatingCellName;
+
         public static double Evaluate(string expression)
         {
+            
+            // TODO: розібратися чому зʼявляюсть ексепшини після зміни одніїє з залежних кл
+            foreach (var OutdatedCellName in Table.cells[Calculator.EvaluatingCellName].DependsOn)
+            {
+                Table.cells[OutdatedCellName].AppearsIn.Remove(Calculator.EvaluatingCellName);
+            }
+            Table.cells[Calculator.EvaluatingCellName].DependsOn.Clear();
+
+            if (expression.Equals(string.Empty)) return 0;
 
             var lexer = new GrammarLexer(new AntlrInputStream(expression));
             lexer.RemoveErrorListeners();
