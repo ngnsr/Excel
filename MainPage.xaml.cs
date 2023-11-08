@@ -1,17 +1,21 @@
-﻿using System.Text.Json;
-
+﻿using System.Text;
+using CommunityToolkit.Maui.Storage;
 namespace MyExcel;
 
 public partial class MainPage : ContentPage
 {
+    IFileSaver fileSaver;
+    CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
     static int CountColumn = 5;
     static int CountRow = 10;
 
     readonly static Dictionary<string, IView> Cells = new(capacity: (int)(CountColumn * CountRow * 1.6));
 
-    public MainPage()
+    public MainPage(IFileSaver fileSaver)
     {
         InitializeComponent();
+        this.fileSaver = fileSaver;
+
         CreateGrid();
     }
 
@@ -87,12 +91,13 @@ public partial class MainPage : ContentPage
 
     private async void SaveButton_Clicked(object sender, EventArgs e)
     {
-        string fileName = "Cells.json";
-        using FileStream createStream = File.Create(fileName);
-        Cell EmptyCell = new Cell();
-        var cellsToSerialize = Table.cells.Where(kv => !kv.Value.Equals(EmptyCell)).ToDictionary(kv => kv.Key, kv => kv.Value);
-        await JsonSerializer.SerializeAsync(createStream, cellsToSerialize);
-        await createStream.DisposeAsync();
+        string homePath = (Environment.OSVersion.Platform == PlatformID.Unix || 
+                Environment.OSVersion.Platform == PlatformID.MacOSX)
+            ? Environment.GetEnvironmentVariable("HOME")
+            : Environment.ExpandEnvironmentVariables("%HOMEDRIVE%%HOMEPATH%");
+
+        using var stream = new MemoryStream(Encoding.Default.GetBytes("Howdy! I'm a new file!"));
+        var fileSaverResult = await fileSaver.SaveAsync(homePath, "SampleFile.txt", stream, cancellationTokenSource.Token);
     }
 
     private async void ExitButton_Clicked(object sender, EventArgs e)
