@@ -22,7 +22,7 @@ expression :
  */
 
 NUMBER : INT ('.' INT)?; 
-IDENTIFIER : [a-zA-Z]+[1-9][0-9]*;
+IDENTIFIER : [A-Z]+[1-9][0-9]*;
 INT : ('0'..'9')+;
 arglist: expression (',' expression)*;
 EXPONENT : '^';

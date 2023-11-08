@@ -96,6 +96,10 @@ public partial class MainPage : ContentPage
             ? Environment.GetEnvironmentVariable("HOME")
             : Environment.ExpandEnvironmentVariables("%HOMEDRIVE%%HOMEPATH%");
 
+        //using FileStream createStream = File.Create(fileName);
+        //Cell EmptyCell = new Cell();
+        //var cellsToSerialize = Table.cells.Where(kv => !kv.Value.Equals(EmptyCell)).ToDictionary(kv => kv.Key, kv => kv.Value);
+        //await JsonSerializer.SerializeAsync(createStream, cellsToSerialize);
         using var stream = new MemoryStream(Encoding.Default.GetBytes("Howdy! I'm a new file!"));
         var fileSaverResult = await fileSaver.SaveAsync(homePath, "SampleFile.txt", stream, cancellationTokenSource.Token);
     }
@@ -122,7 +126,8 @@ public partial class MainPage : ContentPage
             var CellName = columnName + row;
             if (Table.cells[CellName].AppearsIn.Count != 0)
             {
-                await DisplayAlert("Поимлка", "Значення клітини " + CellName + " використовується! Видалення неможливе.", "Ок");
+                string firstCellName = Table.cells[CellName].AppearsIn.First();
+                await DisplayAlert("Поимлка", "Значення клітини " + CellName + " використовується в кліинці " + firstCellName + "! Видалення неможливе.", "Ок");
                 return;
             }
         }
