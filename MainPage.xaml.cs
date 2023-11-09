@@ -1,11 +1,9 @@
-﻿using System.Text;
-using CommunityToolkit.Maui.Storage;
+﻿using CommunityToolkit.Maui.Storage;
 namespace MyExcel;
 
 public partial class MainPage : ContentPage
 {
     IFileSaver fileSaver;
-    CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
     static int CountColumn = 5;
     static int CountRow = 10;
 
@@ -14,8 +12,8 @@ public partial class MainPage : ContentPage
     public MainPage(IFileSaver fileSaver)
     {
         InitializeComponent();
-        this.fileSaver = fileSaver;
 
+        this.fileSaver = fileSaver;
         CreateGrid();
     }
 
@@ -91,18 +89,54 @@ public partial class MainPage : ContentPage
 
     private async void SaveButton_Clicked(object sender, EventArgs e)
     {
-        string homePath = (Environment.OSVersion.Platform == PlatformID.Unix || 
-                Environment.OSVersion.Platform == PlatformID.MacOSX)
-            ? Environment.GetEnvironmentVariable("HOME")
-            : Environment.ExpandEnvironmentVariables("%HOMEDRIVE%%HOMEPATH%");
-
-        //using FileStream createStream = File.Create(fileName);
-        //Cell EmptyCell = new Cell();
-        //var cellsToSerialize = Table.cells.Where(kv => !kv.Value.Equals(EmptyCell)).ToDictionary(kv => kv.Key, kv => kv.Value);
-        //await JsonSerializer.SerializeAsync(createStream, cellsToSerialize);
-        using var stream = new MemoryStream(Encoding.Default.GetBytes("Howdy! I'm a new file!"));
-        var fileSaverResult = await fileSaver.SaveAsync(homePath, "SampleFile.txt", stream, cancellationTokenSource.Token);
+       var jsonManager = new JsonFileManager(fileSaver); 
+       var fileSaverResult = await jsonManager.SaveToFileAsync( new FileRepresentation(CountRow, CountColumn, Table.cells));
+       if(fileSaverResult.IsSuccessful){
+           await DisplayAlert("Збереження", "Таблицю успішно збережено за шляхом: " + fileSaverResult.FilePath, "Ок");
+       } else {
+           await DisplayAlert("Збереження", "Помилка при збереженні!", "Ок");
+       }
     }
+
+    private async void OpenButton_Clicked(object sender, EventArgs e){
+        var jsonManager = new JsonFileManager(fileSaver);
+        var fileRepresentaiton = await jsonManager.LoadFromFile();
+        var NewCountColumn = fileRepresentaiton.CountColumn;
+        var NewCountRow = fileRepresentaiton.CountRow;
+
+        // clear Cells and Table.cells
+        Cells.Clear();
+        Table.cells.Clear();
+
+        // remove grid column/row definitions
+        grid.ColumnDefinitions.Clear();
+        grid.RowDefinitions.Clear();
+
+        // remove grid Children
+        grid.Children.Clear();
+
+        // update CountRow and Count Column
+        CountColumn = NewCountColumn;
+        CountRow = NewCountRow;
+
+        // recreate grid
+        CreateGrid();
+
+        foreach(var pair in fileRepresentaiton.cells)
+        {
+            //update gui
+            string key = pair.Key;
+            var entry = (Entry)Cells[key];
+            Cell cell = pair.Value;
+            if (cell.Expression.Equals(string.Empty)) entry.Text = string.Empty;
+            else entry.Text = cell.Value.ToString();
+
+            //update Table
+            Table.cells[key] = cell;
+        }
+
+        await DisplayAlert("Новий файл", "Таблиця успішно відкрита!", "Ок");
+    } 
 
     private async void ExitButton_Clicked(object sender, EventArgs e)
     {

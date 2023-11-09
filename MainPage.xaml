@@ -7,7 +7,7 @@ x:Class="MyExcel.MainPage">
 <Grid>
 	<Grid.RowDefinitions>
 		<RowDefinition Height="Auto" /> 
-		<RowDefinition Height="Auto" />
+		<!--<RowDefinition Height="Auto" />-->
 		<RowDefinition Height="*" />
 	</Grid.RowDefinitions>
 	<Grid.ColumnDefinitions>
@@ -16,6 +16,7 @@ x:Class="MyExcel.MainPage">
 	</Grid.ColumnDefinitions>
 	<StackLayout Orientation="Horizontal">
 		<Button Text="Зберегти" Clicked="SaveButton_Clicked" />
+		<Button Text="Відкрити" Clicked="OpenButton_Clicked" />
 		<Button Text="Вийти" Clicked="ExitButton_Clicked" />
 		<Button Text="Довідка" Clicked="HelpButton_Clicked" />
 		<Button Text="Видалити рядок" Clicked="DeleteRowButton_Clicked"/>
@@ -23,7 +24,7 @@ x:Class="MyExcel.MainPage">
 		<Button Text="Додати рядок" Clicked="AddRowButton_Clicked" />
 		<Button Text="Додати стовпчик" Clicked="AddColumnButton_Clicked" />
 	</StackLayout>
-	<Entry x:Name="textInput" Placeholder="Введіть текст" Grid.Row="1" Grid.ColumnSpan="2" />
+	<!--<Entry x:Name="textInput" Placeholder="Введіть текст" Grid.Row="1" Grid.ColumnSpan="2" />-->
 	<ScrollView Grid.Row="2" Grid.ColumnSpan="2">
 		<Grid x:Name="grid"></Grid>
 	</ScrollView>
