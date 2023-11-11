@@ -1,7 +1,5 @@
 ﻿using CommunityToolkit.Maui.Storage;
-using CommunityToolkit.Maui.Views;
 using Mopups.Interfaces;
-using Mopups.Pages;
 
 namespace MyExcel;
 
@@ -98,13 +96,23 @@ public partial class MainPage : ContentPage
 
     private async void SaveButton_Clicked(object sender, EventArgs e)
     {
-       var jsonManager = new JsonFileManager(fileSaver); 
-       var filePath = await jsonManager.SaveToFileAsync( new FileRepresentation(CountRow, CountColumn, Table.cells), "Table.json");
-       if(!filePath.Equals(string.Empty)){
-           await DisplayAlert("Збереження", "Таблицю успішно збережено за шляхом: " + filePath, "Ок");
-       } else {
-           await DisplayAlert("Збереження", "Помилка при збереженні!", "Ок");
-       }
+        await SaveToFile();
+    }
+
+    private async Task SaveToFile(){
+        try
+        {
+            var jsonManager = new JsonFileManager(fileSaver);
+            var filePath = await jsonManager.SaveToFileAsync(new FileRepresentation(CountRow, CountColumn, Table.cells), "Table.json");
+            if (!string.IsNullOrWhiteSpace(filePath))
+            {
+                await DisplayAlert("Збереження", "Таблицю успішно збережено за шляхом: " + filePath, "Ок");
+            }
+        }
+        catch(Exception e) {
+            Console.WriteLine(e.Message);
+        }
+       
     }
 
     private async void OpenButton_Clicked(object sender, EventArgs e){
@@ -152,14 +160,17 @@ public partial class MainPage : ContentPage
 
     private async void ExitButton_Clicked(object sender, EventArgs e)
     {
-        bool answer = await DisplayAlert("Підтвердження", "Ви дійсно хочете вийти ? ", "Так", "Ні");
-        if (!answer) return;
+        bool saveChanges = await DisplayAlert("Збереження", "Зберегти таблицю ?", "Так", "Ні");
+        if(!saveChanges) return;
+
+        await SaveToFile();
+        
         System.Environment.Exit(0);
     }
 
     private async void HelpButton_Clicked(object sender, EventArgs e)
     {
-        await DisplayAlert("Довідка", "Лабораторна робота 1. Студента Рісенгіна Владислава", "OK");
+        await DisplayAlert("Довідка", "Лабораторна робота 1*. Студента Рісенгіна Владислава", "OK");
     }
 
     private async void DeleteColumnButton_Clicked(object sender, EventArgs e)
@@ -305,7 +316,7 @@ public partial class MainPage : ContentPage
         Cells.Add(CellName, entry);
     }
 
-    public async void SaveOnGDriveButton_Clicked(object sender, EventArgs e)
+    private async void SaveOnGDriveButton_Clicked(object sender, EventArgs e)
     {
         var popup = new GDriveUploadPopup();
         await popupNavigation.PushAsync(popup);
@@ -323,7 +334,7 @@ public partial class MainPage : ContentPage
         await DisplayAlert("GDrive Upload", result, "Ок");
     }
 
-    public async void OpenFromGDriveButton_Clicked(object sender, EventArgs e)
+    private async void OpenFromGDriveButton_Clicked(object sender, EventArgs e)
     {
         var popup = new GDriveSavePopup();
         await popupNavigation.PushAsync(popup);

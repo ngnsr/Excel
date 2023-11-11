@@ -23,9 +23,8 @@
                            HorizontalOptions="Start"/>
 
                     
-                    <Entry x:Name="FileNameEntry" Grid.Row="0" Grid.Column="1" VerticalOptions="CenterAndExpand" HorizontalOptions="FillAndExpand" Background="#67856f"/>
+                    <Entry x:Name="FileNameEntry" Grid.Row="0" Grid.Column="1" VerticalOptions="CenterAndExpand" HorizontalOptions="FillAndExpand" Background="#2a2e38"/>
 
-                    <!-- Second Row -->
                     <Button Text="Ок" Grid.Row="1" Grid.ColumnSpan="2"
                             x:Name="SaveButton"
                             Clicked="SaveButton_Clicked"

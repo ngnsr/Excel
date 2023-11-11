@@ -29,7 +29,6 @@ namespace MyExcel
             var identifier = context.GetText();
             Table.cells[Calculator.EvaluatingCellName].DependsOn.Add(identifier);
             Table.cells[identifier].AppearsIn.Add(Calculator.EvaluatingCellName);
-            //видобути значення змінної з таблиці
             return Table.GetValue(identifier);
         }
 

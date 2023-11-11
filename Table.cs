@@ -20,14 +20,14 @@
 		public static double GetValue(string CellName)
 		{
 			Cell cell;
-			return (cells.TryGetValue(CellName, out cell)) ? cell.Value : 0;
+			return (cells.TryGetValue(CellName, out cell)) ? cell.Value : throw new ArgumentException();
 		}
 
 		public static string GetExpression(string CellName)
 		{
-            Cell cell;
-            return (cells.TryGetValue(CellName, out cell)) ? cell.Expression : string.Empty;
-        }
+			Cell cell;
+			return (cells.TryGetValue(CellName, out cell)) ? cell.Expression : string.Empty;
+		}
 
 		public static double Refresh(string CellName, string expression)
 		{
@@ -40,27 +40,27 @@
 			foreach(var identifier in listOfIdentifiers)
 			{
 				if(HasCyclicDependency(identifier))
-                    throw new ArgumentException();
-            }
+					throw new ArgumentException();
+			}
 
 			return Calculate(CellName, expression);
 		}
 
 		public static double Calculate(string CellName, string expression)
 		{
-            Calculator.EvaluatingCellName = CellName;
-            double value = Calculator.Evaluate(expression);
-            cells[CellName].Expression = expression;
-            cells[CellName].Value = value;
-            var OutdatedCells = Table.cells[Calculator.EvaluatingCellName].AppearsIn.ToArray();
-            foreach (var OutdatedCellName in OutdatedCells)
-            {
-                Calculate(OutdatedCellName, Table.GetExpression(OutdatedCellName));
-                MainPage.Refresh(OutdatedCellName);
-            }
+			Calculator.EvaluatingCellName = CellName;
+			double value = Calculator.Evaluate(expression);
+			cells[CellName].Expression = expression;
+			cells[CellName].Value = value;
+			var OutdatedCells = Table.cells[Calculator.EvaluatingCellName].AppearsIn.ToArray();
+			foreach (var OutdatedCellName in OutdatedCells)
+			{
+				Calculate(OutdatedCellName, Table.GetExpression(OutdatedCellName));
+				MainPage.Refresh(OutdatedCellName);
+			}
 
-            return value;
-        }
+			return value;
+		}
 
 		private static bool HasCyclicDependency(string CellName)
 		{
