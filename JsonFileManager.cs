@@ -11,8 +11,11 @@ namespace MyExcel
             this.fileSaver = fileSaver;
         }
 
-        public async Task<FileSaverResult> SaveToFileAsync(FileRepresentation file)
+        public async Task<string> SaveToFileAsync(FileRepresentation file, string fileName)
         {
+            if (string.IsNullOrWhiteSpace(fileName))
+                throw new ArgumentException();
+
             string homePath = (Environment.OSVersion.Platform == PlatformID.Unix ||
                 Environment.OSVersion.Platform == PlatformID.MacOSX)
                 ? Environment.GetEnvironmentVariable("HOME")
@@ -21,11 +24,11 @@ namespace MyExcel
 
             var jsonString = JsonSerializer.Serialize(file);
             CancellationToken cancellationToken = new CancellationTokenSource().Token;
-            var fileSaverResult = await fileSaver.SaveAsync(homePath, "Table.json", new MemoryStream(Encoding.Default.GetBytes(jsonString)), cancellationToken);
-            return fileSaverResult;
+            var fileSaverResult = await fileSaver.SaveAsync(homePath, fileName, new MemoryStream(Encoding.Default.GetBytes(jsonString)), cancellationToken);
+            return fileSaverResult.FilePath;
         }
 
-        public async Task<FileRepresentation> LoadFromFile()
+        public async Task<FileRepresentation> LoadFromFileAsync()
         {
             var jsonFileType =
                 new FilePickerFileType(new Dictionary<DevicePlatform, IEnumerable<string>>{
@@ -37,9 +40,14 @@ namespace MyExcel
             if(result == null) 
                 throw new ArgumentException();
 
-            var stream = await result.OpenReadAsync();
+            using var stream = await result.OpenReadAsync();
             var fileRepresentation = JsonSerializer.Deserialize<FileRepresentation>(stream);
             return fileRepresentation;
+        }
+
+        public static string ToJson(FileRepresentation file)
+        {
+            return JsonSerializer.Serialize(file);
         }
     }
 }

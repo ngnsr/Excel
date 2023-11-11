@@ -1,19 +1,28 @@
 ﻿using CommunityToolkit.Maui.Storage;
+using CommunityToolkit.Maui.Views;
+using Mopups.Interfaces;
+using Mopups.Pages;
+
 namespace MyExcel;
 
 public partial class MainPage : ContentPage
 {
     IFileSaver fileSaver;
+    IPopupNavigation popupNavigation;
+
     static int CountColumn = 5;
     static int CountRow = 10;
 
+    GDriveManager driveManager;
+
     readonly static Dictionary<string, IView> Cells = new(capacity: (int)(CountColumn * CountRow * 1.6));
 
-    public MainPage(IFileSaver fileSaver)
+    public MainPage(IFileSaver fileSaver, IPopupNavigation popupNavigation)
     {
         InitializeComponent();
 
         this.fileSaver = fileSaver;
+        this.popupNavigation = popupNavigation;
         CreateGrid();
     }
 
@@ -90,9 +99,9 @@ public partial class MainPage : ContentPage
     private async void SaveButton_Clicked(object sender, EventArgs e)
     {
        var jsonManager = new JsonFileManager(fileSaver); 
-       var fileSaverResult = await jsonManager.SaveToFileAsync( new FileRepresentation(CountRow, CountColumn, Table.cells));
-       if(fileSaverResult.IsSuccessful){
-           await DisplayAlert("Збереження", "Таблицю успішно збережено за шляхом: " + fileSaverResult.FilePath, "Ок");
+       var filePath = await jsonManager.SaveToFileAsync( new FileRepresentation(CountRow, CountColumn, Table.cells), "Table.json");
+       if(!filePath.Equals(string.Empty)){
+           await DisplayAlert("Збереження", "Таблицю успішно збережено за шляхом: " + filePath, "Ок");
        } else {
            await DisplayAlert("Збереження", "Помилка при збереженні!", "Ок");
        }
@@ -100,11 +109,14 @@ public partial class MainPage : ContentPage
 
     private async void OpenButton_Clicked(object sender, EventArgs e){
         var jsonManager = new JsonFileManager(fileSaver);
-        var fileRepresentaiton = await jsonManager.LoadFromFile();
-        var NewCountColumn = fileRepresentaiton.CountColumn;
-        var NewCountRow = fileRepresentaiton.CountRow;
+        var fileRepresentation = await jsonManager.LoadFromFileAsync();
+        OpenNewTable(fileRepresentation);
+    } 
 
-        // clear Cells and Table.cells
+    private async void OpenNewTable(FileRepresentation fileRepresentation){
+        var NewCountColumn = fileRepresentation.CountColumn;
+        var NewCountRow = fileRepresentation.CountRow;
+                // clear Cells and Table.cells
         Cells.Clear();
         Table.cells.Clear();
 
@@ -122,7 +134,7 @@ public partial class MainPage : ContentPage
         // recreate grid
         CreateGrid();
 
-        foreach(var pair in fileRepresentaiton.cells)
+        foreach(var pair in fileRepresentation.cells)
         {
             //update gui
             string key = pair.Key;
@@ -136,7 +148,7 @@ public partial class MainPage : ContentPage
         }
 
         await DisplayAlert("Новий файл", "Таблиця успішно відкрита!", "Ок");
-    } 
+    }
 
     private async void ExitButton_Clicked(object sender, EventArgs e)
     {
@@ -152,7 +164,7 @@ public partial class MainPage : ContentPage
 
     private async void DeleteColumnButton_Clicked(object sender, EventArgs e)
     {
-        if (grid.ColumnDefinitions.Count <= 1) return;
+        if (grid.ColumnDefinitions.Count <= 2) return;
         string columnName = GetColumnName(CountColumn);
 
         for (int row = 1; row <= CountRow; row++)
@@ -184,7 +196,7 @@ public partial class MainPage : ContentPage
 
     private async void DeleteRowButton_Clicked(object sender, EventArgs e)
     {
-        if (grid.RowDefinitions.Count <= 1) return;
+        if (grid.RowDefinitions.Count <= 2) return;
         
         for (int col = 1; col <= CountColumn; col++)
         {
@@ -259,7 +271,8 @@ public partial class MainPage : ContentPage
         {
             Text = string.Empty,
             VerticalOptions = LayoutOptions.Center,
-            HorizontalOptions = LayoutOptions.Center
+            HorizontalOptions = LayoutOptions.Center,
+            BackgroundColor = Color.FromHex("676767")
         };
         entry.Unfocused += Entry_Unfocused;
         entry.Focused += Entry_Focused;
@@ -290,5 +303,36 @@ public partial class MainPage : ContentPage
 
         Table.AddNewEntry(GetColumnName(col) + row);
         Cells.Add(CellName, entry);
+    }
+
+    public async void SaveOnGDriveButton_Clicked(object sender, EventArgs e)
+    {
+        var popup = new GDriveUploadPopup();
+        await popupNavigation.PushAsync(popup);
+
+        var fileName = await popup.PopupDismissedTask;
+        
+        if (string.IsNullOrEmpty(fileName)) return;
+
+        if(driveManager == null)
+        {
+            driveManager = await GDriveManager.Create();
+        }
+        
+        var result = await driveManager.SaveToFileAsync(new FileRepresentation(CountRow, CountColumn, Table.cells), fileName);
+        await DisplayAlert("GDrive Upload", result, "Ок");
+    }
+
+    public async void OpenFromGDriveButton_Clicked(object sender, EventArgs e)
+    {
+        var popup = new GDriveSavePopup();
+        await popupNavigation.PushAsync(popup);
+        //if (driveManager == null)
+        //{
+        //    driveManager = await GDriveManager.Create();
+        //}
+
+        //var list = driveManager.ListFilesAsync().Result;
+
     }
 }

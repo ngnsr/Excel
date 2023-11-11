@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<mopups:PopupPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:mopups="clr-namespace:Mopups.Pages;assembly=Mopups"
+             x:Class="MyExcel.GDriveSavePopup"
+             CloseWhenBackgroundIsClicked="True"
+             Background="Black">
+
+    <!--<ListView HorizontalOptions="Center" VerticalOptions="Center" WidthRequest="400" HeightRequest="700">
+        <ListView.ItemTemplate>
+            <DataTemplate>
+                <ViewCell>
+                    <Label Text="{Binding .}" TextColor="Red"/>
+                </ViewCell>
+            </DataTemplate>
+        </ListView.ItemTemplate>
+        <ListView.ItemsSource>
+            <x:Array Type="{x:Type x:String}">
+                <x:String>Item 1</x:String>
+                <x:String>Item 2</x:String>
+                <x:String>Item 3</x:String>
+            </x:Array>
+        </ListView.ItemsSource>
+    </ListView>-->
+
+    <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" WidthRequest="500" HeightRequest="649">
+        <Image Source="meme.png"/>
+    </VerticalStackLayout>
+</mopups:PopupPage>

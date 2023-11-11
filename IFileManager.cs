@@ -1,10 +1,9 @@
-﻿using CommunityToolkit.Maui.Storage;
-namespace MyExcel
+﻿namespace MyExcel
 {
 	public interface IFileManager
 	{
-		Task<FileSaverResult> SaveToFileAsync(FileRepresentation file);
-		Task<FileRepresentation> LoadFromFile();
+		Task<string> SaveToFileAsync(FileRepresentation file, string fileName);
+		Task<FileRepresentation> LoadFromFileAsync();
 	}
 }
 

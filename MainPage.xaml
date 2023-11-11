@@ -3,20 +3,24 @@
 xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
 xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
 xmlns:local="clr-namespace:MyExcel"
-x:Class="MyExcel.MainPage">
-<Grid>
+	x:DataType="local:MainPage"
+x:Class="MyExcel.MainPage"
+	Title="">
+<Grid Background="#2a2e38">
 	<Grid.RowDefinitions>
-		<RowDefinition Height="Auto" /> 
-		<!--<RowDefinition Height="Auto" />-->
+		<RowDefinition Height="Auto" />
+		<RowDefinition Height="Auto" />
 		<RowDefinition Height="*" />
 	</Grid.RowDefinitions>
 	<Grid.ColumnDefinitions>
 		<ColumnDefinition Width="Auto" />
 		<ColumnDefinition Width="*" />
 	</Grid.ColumnDefinitions>
-	<StackLayout Orientation="Horizontal">
+	<StackLayout Orientation="Horizontal" Spacing="5" Margin="8" HorizontalOptions="Fill">
 		<Button Text="Зберегти" Clicked="SaveButton_Clicked" />
 		<Button Text="Відкрити" Clicked="OpenButton_Clicked" />
+		<Button Text="Зберегти на GDrive" Clicked="SaveOnGDriveButton_Clicked" />
+		<Button Text="Відкрити з GDrive" Clicked="OpenFromGDriveButton_Clicked" />
 		<Button Text="Вийти" Clicked="ExitButton_Clicked" />
 		<Button Text="Довідка" Clicked="HelpButton_Clicked" />
 		<Button Text="Видалити рядок" Clicked="DeleteRowButton_Clicked"/>
@@ -24,6 +28,8 @@ x:Class="MyExcel.MainPage">
 		<Button Text="Додати рядок" Clicked="AddRowButton_Clicked" />
 		<Button Text="Додати стовпчик" Clicked="AddColumnButton_Clicked" />
 	</StackLayout>
+	<BoxView Grid.Row="1" Grid.ColumnSpan="2" Color="LightGrey" HeightRequest="1" HorizontalOptions="FillAndExpand" Margin="0,10,0,10" />
+
 	<!--<Entry x:Name="textInput" Placeholder="Введіть текст" Grid.Row="1" Grid.ColumnSpan="2" />-->
 	<ScrollView Grid.Row="2" Grid.ColumnSpan="2">
 		<Grid x:Name="grid"></Grid>

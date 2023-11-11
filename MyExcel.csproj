@@ -53,6 +53,7 @@
 
 		<!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
 		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+		<MauiAsset Include="client_secrets.json" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -63,6 +64,10 @@
 		</PackageReference>
 		<PackageReference Include="Antlr4.Runtime" Version="4.6.6" />
 		<PackageReference Include="CommunityToolkit.Maui" Version="6.1.0" />
+		<PackageReference Include="Mopups" Version="1.2.0" />
+		<PackageReference Include="Google.Apis" Version="1.63.0" />
+		<PackageReference Include="Google.Apis.Drive.v3" Version="1.63.0.3155" />
+		<PackageReference Include="Google.Apis.Auth" Version="1.63.0" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -77,5 +82,12 @@
 	    <ForceAtn>false</ForceAtn>
 	    <CustomToolNamespace>MyExcel</CustomToolNamespace>
 	  </Antlr4>
+	</ItemGroup>
+	<ItemGroup>
+	  <None Remove="client_secrets.json" />
+	  <None Remove="Resources\Images\meme.png" />
+	</ItemGroup>
+	<ItemGroup>
+	  <BundleResource Include="Resources\Images\meme.png" />
 	</ItemGroup>
 </Project>
