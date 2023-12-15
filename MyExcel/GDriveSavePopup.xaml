@@ -23,7 +23,7 @@
         </ListView.ItemsSource>
     </ListView>-->
 
-    <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" WidthRequest="500" HeightRequest="649">
+    <!--<VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" WidthRequest="500" HeightRequest="649">
         <Image Source="meme.png"/>
-    </VerticalStackLayout>
+    </VerticalStackLayout>-->
 </mopups:PopupPage>

@@ -16,6 +16,14 @@
 			Expression = string.Empty;
 			Value = 0;
 		}
+
+		public Cell(double Value)
+		{
+            DependsOn = new HashSet<string>();
+            AppearsIn = new HashSet<string>();
+            Expression = string.Empty;
+            this.Value = Value;
+        }
 	}
 }
 

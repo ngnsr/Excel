@@ -3,8 +3,14 @@
 	<PropertyGroup>
 		<TargetFrameworks>net7.0-maccatalyst</TargetFrameworks>
 		<MtouchLink>SdkOnly</MtouchLink>
-		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net7.0-windows10.0.19041.0</TargetFrameworks>
-		<!-- Uncomment to also build the tizen app. You will need to install tizen by following this: https://github.com/Samsung/Tizen.NET -->
+		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">
+			$(TargetFrameworks);net7.0-windows10.0.19041.0</TargetFrameworks>
+		<!-- Uncomment to also build the tizen app. You will need to install tizen by following
+		this: https://github.com/Samsung/Tizen.NET -->
+		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">
+			$(TargetFrameworks);net7.0-windows10.0.19041.0</TargetFrameworks>
+		<!-- Uncomment to also build the tizen app. You will need to install tizen by following
+		this: https://github.com/Samsung/Tizen.NET -->
 		<!-- <TargetFrameworks>$(TargetFrameworks);net7.0-tizen</TargetFrameworks> -->
 		<OutputType>Exe</OutputType>
 		<RootNamespace>MyExcel</RootNamespace>
@@ -23,23 +29,38 @@
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
 		<ApplicationVersion>1</ApplicationVersion>
 
-		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">11.0</SupportedOSPlatformVersion>
-		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">13.1</SupportedOSPlatformVersion>
-		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
-		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
-		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
-		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion
+			Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
+			11.0</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion
+			Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">
+			13.1</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion
+			Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
+			21.0</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion
+			Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">
+			10.0.17763.0</SupportedOSPlatformVersion>
+		<TargetPlatformMinVersion
+			Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">
+			10.0.17763.0</TargetPlatformMinVersion>
+		<SupportedOSPlatformVersion
+			Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">
+			6.5</SupportedOSPlatformVersion>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-ios|AnyCPU'">
-	  <CreatePackage>false</CreatePackage>
+	<PropertyGroup
+		Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-ios|AnyCPU'">
+		<CreatePackage>false</CreatePackage>
 	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-maccatalyst|AnyCPU'">
-	  <CreatePackage>false</CreatePackage>
+	<PropertyGroup
+		Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-maccatalyst|AnyCPU'">
+		<CreatePackage>false</CreatePackage>
 	</PropertyGroup>
 	<ItemGroup>
 		<!-- App Icon -->
-		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
+		<MauiIcon Include="Resources\AppIcon\appicon.svg"
+			ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
 
 		<!-- Splash Screen -->
 		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
@@ -53,14 +74,63 @@
 
 		<!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
 		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+		<SupportedOSPlatformVersion
+			Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
+			11.0</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion
+			Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">
+			13.1</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion
+			Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
+			21.0</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion
+			Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">
+			10.0.17763.0</SupportedOSPlatformVersion>
+		<TargetPlatformMinVersion
+			Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">
+			10.0.17763.0</TargetPlatformMinVersion>
+		<SupportedOSPlatformVersion
+			Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">
+			6.5</SupportedOSPlatformVersion>
+	</ItemGroup>
+
+	<PropertyGroup
+		Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-ios|AnyCPU'">
+		<CreatePackage>false</CreatePackage>
+	</PropertyGroup>
+	<PropertyGroup
+		Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-maccatalyst|AnyCPU'">
+		<CreatePackage>false</CreatePackage>
+	</PropertyGroup>
+	<ItemGroup>
+		<!-- App Icon -->
+		<MauiIcon Include="MyExcel\Resources\AppIcon\appicon.svg"
+			ForegroundFile="MyExcel\AppIcon\appiconfg.svg" Color="#512BD4" />
+
+		<!-- Splash Screen -->
+		<MauiSplashScreen Include="MyExcel\Resources\Splash\splash.svg" Color="#512BD4"
+			BaseSize="128,128" />
+
+		<!-- Images -->
+		<MauiImage Include="MyExcel\Resources\Images\*" />
+		<MauiImage Update="MyExcel\Resources\Images\dotnet_bot.svg" BaseSize="168,208" />
+
+		<!-- Custom Fonts -->
+		<MauiFont Include="MyExcel\Resources\Fonts\*" />
+
+		<!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
+		<MauiAsset Include="MyExcel\Resources\Raw\**"
+			LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
 		<MauiAsset Include="client_secrets.json" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
 		<PackageReference Include="Antlr4" Version="4.6.6">
-		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		  <PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
 		<PackageReference Include="Antlr4.Runtime" Version="4.6.6" />
 		<PackageReference Include="CommunityToolkit.Maui" Version="6.1.0" />
@@ -71,23 +141,38 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Antlr4 Update="Grammar.g4">
-	    <Generator>MSBuild:Compile</Generator>
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	    <Encoding>UTF-8</Encoding>
-	    <TargetLanguage>CSharp</TargetLanguage>
-	    <Listener>true</Listener>
-	    <Visitor>true</Visitor>
-	    <Abstract>false</Abstract>
-	    <ForceAtn>false</ForceAtn>
-	    <CustomToolNamespace>MyExcel</CustomToolNamespace>
-	  </Antlr4>
+		<Antlr4 Update="Grammar.g4">
+			<Generator>MSBuild:Compile</Generator>
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+			<Encoding>UTF-8</Encoding>
+			<TargetLanguage>CSharp</TargetLanguage>
+			<Listener>true</Listener>
+			<Visitor>true</Visitor>
+			<Abstract>false</Abstract>
+			<ForceAtn>false</ForceAtn>
+			<CustomToolNamespace>MyExcel</CustomToolNamespace>
+		</Antlr4>
 	</ItemGroup>
 	<ItemGroup>
-	  <None Remove="client_secrets.json" />
-	  <None Remove="Resources\Images\meme.png" />
+		<None Remove="client_secrets.json" />
+		<None Remove="Resources\Images\meme.png" />
 	</ItemGroup>
 	<ItemGroup>
-	  <BundleResource Include="Resources\Images\meme.png" />
+		<BundleResource Include="Resources\Images\meme.png" />
+		<Antlr4 Update="Grammar.g4">
+			<Generator>MSBuild:Compile</Generator>
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+			<Encoding>UTF-8</Encoding>
+			<TargetLanguage>CSharp</TargetLanguage>
+			<Listener>true</Listener>
+			<Visitor>true</Visitor>
+			<Abstract>false</Abstract>
+			<ForceAtn>false</ForceAtn>
+			<CustomToolNamespace>MyExcel</CustomToolNamespace>
+		</Antlr4>
+	</ItemGroup>
+	<ItemGroup>
+		<None Remove="client_secrets.json" />
+		<None Remove="Resources\Images\meme.png" />
 	</ItemGroup>
 </Project>

@@ -7,19 +7,22 @@ namespace MyExcel
     public static class Calculator
     {
         public static string EvaluatingCellName;
-        
+
         public static double Evaluate(string expression)
         {
-            
-            foreach (var OutdatedCellName in Table.cells[Calculator.EvaluatingCellName].DependsOn)
+            if (!string.IsNullOrEmpty(EvaluatingCellName))
             {
-                Table.cells[OutdatedCellName].AppearsIn.Remove(Calculator.EvaluatingCellName);
+                foreach (var OutdatedCellName in Table.cells[Calculator.EvaluatingCellName].DependsOn)
+                {
+                    Table.cells[OutdatedCellName].AppearsIn.Remove(Calculator.EvaluatingCellName);
+                }
+                Table.cells[Calculator.EvaluatingCellName].DependsOn.Clear();
             }
-            Table.cells[Calculator.EvaluatingCellName].DependsOn.Clear();
 
             if (expression.Equals(string.Empty)) return 0;
 
-            if(Regex.Match(expression, @"^([+-]?\d+(\.\d+)?)$").Success){
+            if (Regex.Match(expression, @"^([+-]?\d+(\.\d+)?)$").Success)
+            {
                 return Double.Parse(expression);
             }
 
